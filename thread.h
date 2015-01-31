@@ -11,6 +11,7 @@ enum thread_status
     THREAD_RUNNING,     /* Running thread. */
     THREAD_READY,       /* Not running but ready to run. */
     THREAD_BLOCKED,     /* Waiting for an event to trigger. */
+    THREAD_SLEEPING,    /* New state for sleeping threads*/
     THREAD_DYING        /* About to be destroyed. */
   };
 
@@ -97,7 +98,7 @@ struct thread
     /* Owned by userprog/process.c. */
     uint32_t *pagedir;                  /* Page directory. */
 #endif
-
+    int64_t wake_time;                 /*The time a thread needed to sleep*/
     /* Owned by thread.c. */
     unsigned magic;                     /* Detects stack overflow. */
   };
@@ -137,5 +138,8 @@ int thread_get_nice (void);
 void thread_set_nice (int);
 int thread_get_recent_cpu (void);
 int thread_get_load_avg (void);
+
+/* Declare thread_sleep*/
+void thread_sleep(int64_t ticks);
 
 #endif /* threads/thread.h */
