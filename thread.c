@@ -580,6 +580,22 @@ schedule (void)
   ASSERT (intr_get_level () == INTR_OFF);
   ASSERT (cur->status != THREAD_RUNNING);
   ASSERT (is_thread (next));
+/* Modify schedule code */
+    struct list_elem *temp, *e = list_begin(&sleeping_list);
+  int64_t cur_ticks = timer_ticks();
+  
+  while(e != list_end(&sleeping_list)){
+    struct thread *t = list_entry(e, struct thread, allelem);
+    
+    if(cur_ticks >= t->wake_time){
+      list_push_back(&ready_list,&t->elem);
+      t->status = THREAD_READY;
+      temp = e;
+      e = list_next(e);
+      list_remove(temp);
+    }else e = list_next(e);
+   }
+
 
   if (cur != next)
     prev = switch_threads (cur, next);
