@@ -70,7 +70,25 @@ static void *alloc_frame (struct thread *, size_t size);
 static void schedule (void);
 void thread_schedule_tail (struct thread *prev);
 static tid_t allocate_tid (void);
+/*
+  A list used to store the sleeping thread
+*/
+static struct list sleeping_list;
 
+/* Make current thread transfer to sleep state*/
+void thread_sleep(int64_t ticks){
+   struct thread *cur = thread_current();
+   enum intr_level old_level;
+
+   old_level = intr_disable();
+   if (cur != idle_thread){
+       list_push_back(&sleeping_list, &cur->elem);     
+       cur->status = THREAD_SLEEPING;
+       cur->wake_time = timer_ticks() + ticks;
+       schedule();
+   }
+   intr_set_level(old_level);
+}
 /* Initializes the threading system by transforming the code
    that's currently running into a thread.  This can't work in
    general and it is possible in this case only because loader.S
