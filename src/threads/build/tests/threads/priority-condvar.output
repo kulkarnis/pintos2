@@ -1,4 +1,4 @@
-qemu -hda /tmp/Lv4FEfX4o9.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/zoEPGDVIKq.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading.........
 Kernel command line: -q run priority-condvar
@@ -9,6 +9,7 @@ Calibrating timer...  157,081,600 loops/s.
 Boot complete.
 Executing 'priority-condvar':
 (priority-condvar) begin
+(priority-condvar) Thread priority 23 starting.
 (priority-condvar) Signaling...
 (priority-condvar) Signaling...
 (priority-condvar) Signaling...
@@ -21,8 +22,8 @@ Executing 'priority-condvar':
 (priority-condvar) Signaling...
 (priority-condvar) end
 Execution of 'priority-condvar' complete.
-Timer: 25 ticks
-Thread: 0 idle ticks, 25 kernel ticks, 0 user ticks
-Console: 717 characters output
+Timer: 26 ticks
+Thread: 0 idle ticks, 26 kernel ticks, 0 user ticks
+Console: 765 characters output
 Keyboard: 0 keys pressed
 Powering off...

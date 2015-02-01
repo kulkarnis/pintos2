@@ -1,4 +1,4 @@
-qemu -hda /tmp/RpbfvALgfL.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/tMzNljJ_GL.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading.........
 Kernel command line: -q run priority-donate-chain
@@ -23,14 +23,13 @@ Execution of 'priority-donate-chain' complete.
 Timer: 27 ticks
 Thread: 0 idle ticks, 27 kernel ticks, 0 user ticks
 Console: 1039 characters output
-Keyboard: 0 keys pressed
 Kernel PANIC at ../../lib/kernel/list.c:171 in list_insert(): assertion `is_interior (before) || is_tail (before)' failed.
-Call stack: 0xc00283de.
+Call stack: 0xc002845e.
 The `backtrace' program can make call stacks useful.
 Read "Backtraces" in the "Debugging Tools" chapter
 of the Pintos documentation for more information.
 Timer: 28 ticks
 Thread: 0 idle ticks, 28 kernel ticks, 0 user ticks
-Console: 1465 characters output
+Console: 1440 characters output
 Keyboard: 0 keys pressed
 Powering off...

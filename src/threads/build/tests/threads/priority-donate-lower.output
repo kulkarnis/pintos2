@@ -1,4 +1,4 @@
-qemu -hda /tmp/KqzQj05iv8.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/RyBw5lpmKy.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading.........
 Kernel command line: -q run priority-donate-lower
@@ -16,7 +16,7 @@ Executing 'priority-donate-lower':
 (priority-donate-lower) Main thread should have priority 21.  Actual priority: 21.
 (priority-donate-lower) end
 Execution of 'priority-donate-lower' complete.
-Timer: 26 ticks
+Timer: 25 ticks
 Thread: 0 idle ticks, 26 kernel ticks, 0 user ticks
 Console: 781 characters output
 Keyboard: 0 keys pressed

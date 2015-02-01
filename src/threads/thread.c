@@ -80,10 +80,10 @@ static struct list sleeping_list;
 */
 void thread_sleep(int64_t ticks){
     struct thread *cur = thread_current();
-    enum intr_level old_levl;
+    enum intr_level old_level;
     old_level = intr_disable();
     if(cur != idle_thread){
-       list_push-back(&sleeping_list, &cur->elem);
+       list_push_back(&sleeping_list, &cur->elem);
        cur->status = THREAD_SLEEPING;
        cur->wake_time = timer_ticks() + ticks;
        schedule();

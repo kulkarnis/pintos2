@@ -4,6 +4,8 @@
 #include <debug.h>
 #include <list.h>
 #include <stdint.h>
+/* List of sleeping thread*/
+struct list sleeping_list;
 
 /* States in a thread's life cycle. */
 enum thread_status
@@ -142,6 +144,7 @@ void thread_set_nice (int);
 int thread_get_recent_cpu (void);
 int thread_get_load_avg (void);
 
-/* the implementation of time sleep*/
+/* the implementation of time sleep,Added functions*/
 void thread_sleep(int64_t ticks);
+bool cmp_ticks (const struct list_elem *a, const struct list_elem *b, void * aux UNUSED);
 #endif /* threads/thread.h */

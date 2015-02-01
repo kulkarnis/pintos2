@@ -1,5 +1,5 @@
 FAIL
 Kernel panic in run: PANIC at ../../lib/kernel/list.c:171 in list_insert(): assertion `is_interior (before) || is_tail (before)' failed.
-Call stack: 0xc00283de
+Call stack: 0xc002845e
 Translation of call stack:
-0xc00283de: debug_panic (.../../lib/kernel/debug.c:38)
+0xc002845e: debug_panic (.../../lib/kernel/debug.c:38)

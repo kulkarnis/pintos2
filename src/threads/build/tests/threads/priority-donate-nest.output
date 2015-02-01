@@ -1,4 +1,4 @@
-qemu -hda /tmp/Bij5moPd7P.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/OF3GqOrREj.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading.........
 Kernel command line: -q run priority-donate-nest
@@ -17,8 +17,8 @@ Executing 'priority-donate-nest':
 (priority-donate-nest) Low thread should have priority 31.  Actual priority: 31.
 (priority-donate-nest) end
 Execution of 'priority-donate-nest' complete.
-Timer: 27 ticks
-Thread: 0 idle ticks, 27 kernel ticks, 0 user ticks
+Timer: 26 ticks
+Thread: 0 idle ticks, 26 kernel ticks, 0 user ticks
 Console: 859 characters output
 Keyboard: 0 keys pressed
 Powering off...
