@@ -1,19 +1,6 @@
 FAIL
-Test output failed to match any acceptable form.
-
-Acceptable output:
-  (priority-change) begin
-  (priority-change) Creating a high-priority thread 2.
-  (priority-change) Thread 2 now lowering priority.
-  (priority-change) Thread 2 should have just lowered its priority.
-  (priority-change) Thread 2 exiting.
-  (priority-change) Thread 2 should have just exited.
-  (priority-change) end
-Differences in `diff -u' format:
-  (priority-change) begin
-  (priority-change) Creating a high-priority thread 2.
-- (priority-change) Thread 2 now lowering priority.
-  (priority-change) Thread 2 should have just lowered its priority.
-- (priority-change) Thread 2 exiting.
-  (priority-change) Thread 2 should have just exited.
-  (priority-change) end
+Kernel panic in run: PANIC at ../../threads/thread.c:286 in thread_current(): assertion `t->status == THREAD_RUNNING' failed.
+Call stack: 0xc002856e 0xc0020f71
+Translation of call stack:
+0xc002856e: debug_panic (.../../lib/kernel/debug.c:38)
+0xc0020f71: schedule (..../../threads/thread.c:587)

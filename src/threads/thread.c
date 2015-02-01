@@ -72,7 +72,7 @@ void thread_schedule_tail (struct thread *prev);
 static tid_t allocate_tid (void);
 
 /* List of sleeping process*/
-static struct list sleeping_list;
+//static struct list sleeping_list;
 
 /* Let current running thread sleep for TIMER ticks by pushing
    current thread to sleeping list, set status as Thread sleeping
@@ -83,7 +83,8 @@ void thread_sleep(int64_t ticks){
     enum intr_level old_level;
     old_level = intr_disable();
     if(cur != idle_thread){
-       list_push_back(&sleeping_list, &cur->elem);
+     //  list_push_back(&sleeping_list, &cur->elem);
+       list_insert_ordered(&sleeping_list,&cur->elem,(list_less_func *)&cmp_ticks,NULL);
        cur->status = THREAD_SLEEPING;
        cur->wake_time = timer_ticks() + ticks;
        schedule();
@@ -581,8 +582,8 @@ schedule (void)
   ASSERT (is_thread (next));
   struct list_elem *temp, *e = list_begin(&sleeping_list);
   int64_t cur_ticks = timer_ticks();
-  
-  while(e != list_end(&sleeping_list)){
+    
+    e != list_begin(&sleeping_list);
     struct thread *t = list_entry(e, struct thread, elem);
     if (cur_ticks >= t->wake_time){
        t->status = THREAD_READY;
@@ -590,9 +591,9 @@ schedule (void)
        e = list_next(e);
        list_remove(temp);
        list_push_back(&ready_list, &t->elem); 
-    }else e = list_next(e);
+    }
   
-  }
+  
   if (cur != next)
     prev = switch_threads (cur, next);
   thread_schedule_tail (prev);
@@ -615,3 +616,15 @@ allocate_tid (void)
 /* Offset of `stack' member within `struct thread'.
    Used by switch.S, which can't figure it out on its own. */
 uint32_t thread_stack_ofs = offsetof (struct thread, stack);
+
+bool cmp_ticks (const struct list_elem *a, const struct list_elem *b, void *aux UNUSED)
+{
+   struct thread *ta = list_entry(a, struct thread, elem);
+   struct thread *tb = list_entry(b, struct thread, elem);
+   if (ta->wake_time < tb->wake_time)
+    {
+         return true;
+    }
+   return false;
+
+}

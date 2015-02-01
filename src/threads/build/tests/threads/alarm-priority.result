@@ -1,2 +1,6 @@
 FAIL
-run: TIMEOUT after 60 seconds of host CPU time
+Kernel panic in run: PANIC at ../../threads/thread.c:286 in thread_current(): assertion `t->status == THREAD_RUNNING' failed.
+Call stack: 0xc002856e 0xc0020f71
+Translation of call stack:
+0xc002856e: debug_panic (.../../lib/kernel/debug.c:38)
+0xc0020f71: schedule (..../../threads/thread.c:587)
