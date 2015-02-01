@@ -1,7 +1,23 @@
 FAIL
-Kernel panic in run: PANIC at ../../threads/thread.c:287 in thread_current(): assertion `t->status == THREAD_RUNNING' failed.
-Call stack: 0xc00284fe 0xc0020f9d 0x1
-Translation of call stack:
-0xc00284fe: debug_panic (.../../lib/kernel/debug.c:38)
-0xc0020f9d: schedule (..../../threads/thread.c:588)
-0x00000001: (unknown)
+Test output failed to match any acceptable form.
+
+Acceptable output:
+  (priority-preempt) begin
+  (priority-preempt) Thread high-priority iteration 0
+  (priority-preempt) Thread high-priority iteration 1
+  (priority-preempt) Thread high-priority iteration 2
+  (priority-preempt) Thread high-priority iteration 3
+  (priority-preempt) Thread high-priority iteration 4
+  (priority-preempt) Thread high-priority done!
+  (priority-preempt) The high-priority thread should have already completed.
+  (priority-preempt) end
+Differences in `diff -u' format:
+  (priority-preempt) begin
+- (priority-preempt) Thread high-priority iteration 0
+- (priority-preempt) Thread high-priority iteration 1
+- (priority-preempt) Thread high-priority iteration 2
+- (priority-preempt) Thread high-priority iteration 3
+- (priority-preempt) Thread high-priority iteration 4
+- (priority-preempt) Thread high-priority done!
+  (priority-preempt) The high-priority thread should have already completed.
+  (priority-preempt) end

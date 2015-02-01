@@ -1,7 +1,32 @@
 FAIL
-Kernel panic in run: PANIC at ../../threads/thread.c:287 in thread_current(): assertion `t->status == THREAD_RUNNING' failed.
-Call stack: 0xc00284fe 0xc0020f9d 0x1
-Translation of call stack:
-0xc00284fe: debug_panic (.../../lib/kernel/debug.c:38)
-0xc0020f9d: schedule (..../../threads/thread.c:588)
-0x00000001: (unknown)
+Test output failed to match any acceptable form.
+
+Acceptable output:
+  (priority-donate-multiple) begin
+  (priority-donate-multiple) Main thread should have priority 32.  Actual priority: 32.
+  (priority-donate-multiple) Main thread should have priority 33.  Actual priority: 33.
+  (priority-donate-multiple) Thread b acquired lock b.
+  (priority-donate-multiple) Thread b finished.
+  (priority-donate-multiple) Thread b should have just finished.
+  (priority-donate-multiple) Main thread should have priority 32.  Actual priority: 32.
+  (priority-donate-multiple) Thread a acquired lock a.
+  (priority-donate-multiple) Thread a finished.
+  (priority-donate-multiple) Thread a should have just finished.
+  (priority-donate-multiple) Main thread should have priority 31.  Actual priority: 31.
+  (priority-donate-multiple) end
+Differences in `diff -u' format:
+  (priority-donate-multiple) begin
+- (priority-donate-multiple) Main thread should have priority 32.  Actual priority: 32.
+- (priority-donate-multiple) Main thread should have priority 33.  Actual priority: 33.
+- (priority-donate-multiple) Thread b acquired lock b.
+- (priority-donate-multiple) Thread b finished.
++ (priority-donate-multiple) Main thread should have priority 32.  Actual priority: 31.
++ (priority-donate-multiple) Main thread should have priority 33.  Actual priority: 31.
+  (priority-donate-multiple) Thread b should have just finished.
+- (priority-donate-multiple) Main thread should have priority 32.  Actual priority: 32.
+- (priority-donate-multiple) Thread a acquired lock a.
+- (priority-donate-multiple) Thread a finished.
++ (priority-donate-multiple) Main thread should have priority 32.  Actual priority: 31.
+  (priority-donate-multiple) Thread a should have just finished.
+  (priority-donate-multiple) Main thread should have priority 31.  Actual priority: 31.
+  (priority-donate-multiple) end

@@ -1,17 +1,27 @@
-qemu -hda /tmp/QB2jA9soTq.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/CqFM600AiP.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading.........
 Kernel command line: -q run priority-donate-chain
 Pintos booting with 4,088 kB RAM...
 382 pages available in kernel pool.
 382 pages available in user pool.
-Kernel PANIC at ../../threads/thread.c:287 in thread_current(): assertion `t->status == THREAD_RUNNING' failed.
-Call stack: 0xc00284fe 0xc0020f9d 0x1.
-The `backtrace' program can make call stacks useful.
-Read "Backtraces" in the "Debugging Tools" chapter
-of the Pintos documentation for more information.
-Timer: 0 ticks
-Thread: 0 idle ticks, 0 kernel ticks, 0 user ticks
-Console: 527 characters output
+Calibrating timer...  157,081,600 loops/s.
+Boot complete.
+Executing 'priority-donate-chain':
+(priority-donate-chain) begin
+(priority-donate-chain) main got lock.
+(priority-donate-chain) main should have priority 3.  Actual priority: 0.
+(priority-donate-chain) main should have priority 6.  Actual priority: 0.
+(priority-donate-chain) main should have priority 9.  Actual priority: 0.
+(priority-donate-chain) main should have priority 12.  Actual priority: 0.
+(priority-donate-chain) main should have priority 15.  Actual priority: 0.
+(priority-donate-chain) main should have priority 18.  Actual priority: 0.
+(priority-donate-chain) main should have priority 21.  Actual priority: 0.
+(priority-donate-chain) main finishing with priority 0.
+(priority-donate-chain) end
+Execution of 'priority-donate-chain' complete.
+Timer: 27 ticks
+Thread: 0 idle ticks, 27 kernel ticks, 0 user ticks
+Console: 1039 characters output
 Keyboard: 0 keys pressed
 Powering off...
