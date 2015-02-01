@@ -1,0 +1,19 @@
+qemu -hda /tmp/QJOCuuwYB2.dsk -m 4 -net none -nographic -monitor null
+PiLo hda1
+Loading.........
+Kernel command line: -q run priority-preempt
+Pintos booting with 4,088 kB RAM...
+382 pages available in kernel pool.
+382 pages available in user pool.
+Calibrating timer...  157,081,600 loops/s.
+Boot complete.
+Executing 'priority-preempt':
+(priority-preempt) begin
+(priority-preempt) The high-priority thread should have already completed.
+(priority-preempt) end
+Execution of 'priority-preempt' complete.
+Timer: 24 ticks
+Thread: 0 idle ticks, 24 kernel ticks, 0 user ticks
+Console: 472 characters output
+Keyboard: 0 keys pressed
+Powering off...
