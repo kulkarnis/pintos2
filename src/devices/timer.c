@@ -100,7 +100,7 @@ timer_sleep (int64_t ticks)
      {
         return;
      }
-   thread_sleep();
+   thread_sleep(ticks);
    /* Turn interrupts off temporarily to:
      - calculate ticks to stop sleep
      - add thread to sleep list
