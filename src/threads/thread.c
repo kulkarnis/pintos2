@@ -71,6 +71,26 @@ static void schedule (void);
 void thread_schedule_tail (struct thread *prev);
 static tid_t allocate_tid (void);
 
+/* List of sleeping process*/
+static struct list sleeping_list;
+
+/* Let current running thread sleep for TIMER ticks by pushing
+   current thread to sleeping list, set status as Thread sleeping
+   and wake time as current time plus ticks
+*/
+void thread_sleep(int64_t ticks){
+    struct thread *cur = thread_current();
+    enum intr_level old_levl;
+    old_level = intr_disable();
+    if(cur != idle_thread){
+       list_push-back(&sleeping_list, &cur->elem);
+       cur->status = THREAD_SLEEPING;
+       cur->wake_time = timer_ticks() + ticks;
+       schedule();
+
+    }
+    intr_set_level(old_level);
+}
 /* Initializes the threading system by transforming the code
    that's currently running into a thread.  This can't work in
    general and it is possible in this case only because loader.S
@@ -559,7 +579,20 @@ schedule (void)
   ASSERT (intr_get_level () == INTR_OFF);
   ASSERT (cur->status != THREAD_RUNNING);
   ASSERT (is_thread (next));
-
+  struct list_elem *temp, *e = list_begin(&sleeping_list);
+  int64_t cur_ticks = timer_ticks();
+  
+  while(e != list_end(&sleeping_list)){
+    struct thread *t = list_entry(e, struct thread, elem);
+    if (cur_ticks >= t->wake_time){
+       t->status = THREAD_READY;
+       temp = e;
+       e = list_next(e);
+       list_remove(temp);
+       list_push_back(&ready_list, &t->elem); 
+    }else e = list_next(e);
+  
+  }
   if (cur != next)
     prev = switch_threads (cur, next);
   thread_schedule_tail (prev);
