@@ -100,20 +100,20 @@ timer_sleep (int64_t ticks)
      {
         return;
      }
-//   thread_sleep(ticks);
+   thread_sleep(ticks);
    /* Turn interrupts off temporarily to:
      - calculate ticks to stop sleep
      - add thread to sleep list
      - block thread 
    */
-  
+/*  
   enum intr_level old_level = intr_disable ();
   thread_current()->wake_time = timer_ticks() + ticks;
   list_insert_ordered(&sleeping_list, &thread_current()->elem,
                       (list_less_func *)&cmp_ticks, NULL);
   thread_block();
   intr_set_level(old_level);
-  
+*/  
 }
 
 /* Sleeps for approximately MS milliseconds.  Interrupts must be
@@ -194,7 +194,7 @@ timer_interrupt (struct intr_frame *args UNUSED)
   thread_tick ();
   
  //New Addition for removing thread
- struct list_elem *e = list_begin(&sleeping_list);
+/* struct list_elem *e = list_begin(&sleeping_list);
  while(e != list_end(&sleeping_list))
  {
   struct thread *t = list_entry(e, struct thread, elem);
@@ -208,6 +208,7 @@ timer_interrupt (struct intr_frame *args UNUSED)
  }
 
  }
+*/
 }
 
 /* Returns true if LOOPS iterations waits for more than one timer
