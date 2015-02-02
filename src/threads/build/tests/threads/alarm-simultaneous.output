@@ -1,4 +1,4 @@
-qemu -hda /tmp/s9WTxoKuIT.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/VD1VKpFnmX.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading.........
 Kernel command line: -q run alarm-simultaneous
@@ -29,8 +29,8 @@ Executing 'alarm-simultaneous':
 (alarm-simultaneous) iteration 4, thread 2: woke up 0 ticks later
 (alarm-simultaneous) end
 Execution of 'alarm-simultaneous' complete.
-Timer: 280 ticks
-Thread: 250 idle ticks, 30 kernel ticks, 0 user ticks
+Timer: 279 ticks
+Thread: 250 idle ticks, 29 kernel ticks, 0 user ticks
 Console: 1615 characters output
 Keyboard: 0 keys pressed
 Powering off...

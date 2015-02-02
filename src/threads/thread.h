@@ -5,7 +5,7 @@
 #include <list.h>
 #include <stdint.h>
 /* List of sleeping thread*/
-struct list sleeping_list;
+static struct list sleeping_list;
 
 /* States in a thread's life cycle. */
 enum thread_status
@@ -106,6 +106,7 @@ struct thread
    
     /* add wake time to thread struct */
    int64_t wake_time;
+
   };
 
 /* If false (default), use round-robin scheduler.
