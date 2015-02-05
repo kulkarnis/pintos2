@@ -74,23 +74,36 @@ static tid_t allocate_tid (void);
 /* List of sleeping process*/
 //static struct list sleeping_list;
 
+/* Compare sleep time of thread */
+
+bool cmp_ticks (const struct list_elem *a, const struct list_elem *b, void *aux UNUSED)
+{
+   struct thread *ta = list_entry(a, struct thread, elem);
+   struct thread *tb = list_entry(b, struct thread, elem);
+   if (ta->wake_time < tb->wake_time)
+    {
+         return true;
+    }
+   return false;
+
+}
+
+
 /* Let current running thread sleep for TIMER ticks by pushing
    current thread to sleeping list, set status as Thread sleeping
    and wake time as current time plus ticks
 */
 void thread_sleep(int64_t ticks){
     struct thread *cur = thread_current();
-    enum intr_level old_level;
-    old_level = intr_disable();
     if(cur != idle_thread){
      //  list_push_back(&sleeping_list, &cur->elem);
-       list_insert_ordered(&sleeping_list,&cur->elem,cmp_ticks,NULL);
+       enum intr_level old_level = intr_disable();
        cur->status = THREAD_SLEEPING;
        cur->wake_time = timer_ticks() + ticks;
+       list_insert_ordered(&sleeping_list,&cur->elem,cmp_ticks,NULL);
        schedule();
-
+       intr_set_level(old_level);
     }
-    intr_set_level(old_level);
 }
 /* Initializes the threading system by transforming the code
    that's currently running into a thread.  This can't work in
@@ -106,20 +119,21 @@ void thread_sleep(int64_t ticks){
    It is not safe to call thread_current() until this function
    finishes. */
 void
-thread_init (void) 
+thread_init (void)
 {
   ASSERT (intr_get_level () == INTR_OFF);
 
   lock_init (&tid_lock);
   list_init (&ready_list);
   list_init (&all_list);
-  list_init (&sleeping_list);
+  list_init(&sleeping_list);
   /* Set up a thread structure for the running thread. */
   initial_thread = running_thread ();
   init_thread (initial_thread, "main", PRI_DEFAULT);
   initial_thread->status = THREAD_RUNNING;
   initial_thread->tid = allocate_tid ();
-}
+} 
+
 
 /* Starts preemptive thread scheduling by enabling interrupts.
    Also creates the idle thread. */
@@ -570,7 +584,7 @@ thread_schedule_tail (struct thread *prev)
 static void
 update_sleep_thread_schedule(void) 
 {
-  struct list_elem *temp, *e = list_begin(&sleeping_list);
+  struct list_elem *e = list_begin(&sleeping_list);
   int64_t cur_ticks = timer_ticks();
    
 //    e != list_begin(&sleeping_list);
@@ -634,14 +648,3 @@ allocate_tid (void)
    Used by switch.S, which can't figure it out on its own. */
 uint32_t thread_stack_ofs = offsetof (struct thread, stack);
 
-bool cmp_ticks (const struct list_elem *a, const struct list_elem *b, void *aux UNUSED)
-{
-   struct thread *ta = list_entry(a, struct thread, elem);
-   struct thread *tb = list_entry(b, struct thread, elem);
-   if (ta->wake_time < tb->wake_time)
-    {
-         return true;
-    }
-   return false;
-
-}
