@@ -1,4 +1,4 @@
-qemu -hda /tmp/lu_4dmnvKf.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/T7FSMBYEpO.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading.........
 Kernel command line: -q run priority-donate-multiple2
@@ -10,6 +10,7 @@ Boot complete.
 Executing 'priority-donate-multiple2':
 (priority-donate-multiple2) begin
 (priority-donate-multiple2) Main thread should have priority 34.  Actual priority: 31.
+(priority-donate-multiple2) Thread c finished.
 (priority-donate-multiple2) Main thread should have priority 36.  Actual priority: 31.
 (priority-donate-multiple2) Main thread should have priority 36.  Actual priority: 31.
 (priority-donate-multiple2) Threads b, a, c should have just finished, in that order.
@@ -18,6 +19,6 @@ Executing 'priority-donate-multiple2':
 Execution of 'priority-donate-multiple2' complete.
 Timer: 26 ticks
 Thread: 0 idle ticks, 26 kernel ticks, 0 user ticks
-Console: 876 characters output
+Console: 923 characters output
 Keyboard: 0 keys pressed
 Powering off...

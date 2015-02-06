@@ -1,4 +1,4 @@
-qemu -hda /tmp/zOvLaknPdB.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/SWS6MtAkUB.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading.........
 Kernel command line: -q run priority-change
@@ -10,12 +10,14 @@ Boot complete.
 Executing 'priority-change':
 (priority-change) begin
 (priority-change) Creating a high-priority thread 2.
+(priority-change) Thread 2 now lowering priority.
+(priority-change) Thread 2 exiting.
 (priority-change) Thread 2 should have just lowered its priority.
 (priority-change) Thread 2 should have just exited.
 (priority-change) end
 Execution of 'priority-change' complete.
-Timer: 24 ticks
-Thread: 0 idle ticks, 24 kernel ticks, 0 user ticks
-Console: 563 characters output
+Timer: 26 ticks
+Thread: 0 idle ticks, 26 kernel ticks, 0 user ticks
+Console: 649 characters output
 Keyboard: 0 keys pressed
 Powering off...

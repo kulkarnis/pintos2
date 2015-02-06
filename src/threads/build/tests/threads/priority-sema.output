@@ -1,4 +1,4 @@
-qemu -hda /tmp/f4M5gHxN6k.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/W0x4ct2S7g.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading.........
 Kernel command line: -q run priority-sema
@@ -10,19 +10,28 @@ Boot complete.
 Executing 'priority-sema':
 (priority-sema) begin
 (priority-sema) Back in main thread.
+(priority-sema) Thread priority 26 woke up.
 (priority-sema) Back in main thread.
+(priority-sema) Thread priority 25 woke up.
 (priority-sema) Back in main thread.
+(priority-sema) Thread priority 24 woke up.
 (priority-sema) Back in main thread.
+(priority-sema) Thread priority 23 woke up.
 (priority-sema) Back in main thread.
+(priority-sema) Thread priority 22 woke up.
 (priority-sema) Back in main thread.
+(priority-sema) Thread priority 21 woke up.
 (priority-sema) Back in main thread.
+(priority-sema) Thread priority 30 woke up.
 (priority-sema) Back in main thread.
+(priority-sema) Thread priority 29 woke up.
 (priority-sema) Back in main thread.
+(priority-sema) Thread priority 28 woke up.
 (priority-sema) Back in main thread.
 (priority-sema) end
 Execution of 'priority-sema' complete.
-Timer: 26 ticks
-Thread: 0 idle ticks, 26 kernel ticks, 0 user ticks
-Console: 752 characters output
+Timer: 28 ticks
+Thread: 0 idle ticks, 28 kernel ticks, 0 user ticks
+Console: 1148 characters output
 Keyboard: 0 keys pressed
 Powering off...

@@ -36,7 +36,6 @@ Acceptable output:
   (priority-condvar) end
 Differences in `diff -u' format:
   (priority-condvar) begin
-+ (priority-condvar) Signaling...
   (priority-condvar) Thread priority 23 starting.
   (priority-condvar) Thread priority 22 starting.
   (priority-condvar) Thread priority 21 starting.
@@ -65,6 +64,6 @@ Differences in `diff -u' format:
 - (priority-condvar) Thread priority 23 woke up.
   (priority-condvar) Signaling...
 - (priority-condvar) Thread priority 22 woke up.
-- (priority-condvar) Signaling...
+  (priority-condvar) Signaling...
 - (priority-condvar) Thread priority 21 woke up.
   (priority-condvar) end

@@ -1,4 +1,4 @@
-qemu -hda /tmp/VdUrhgM0hJ.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/h7j1sMHJcp.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading.........
 Kernel command line: -q run priority-fifo

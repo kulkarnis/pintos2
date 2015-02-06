@@ -87,7 +87,13 @@ bool cmp_ticks (const struct list_elem *a, const struct list_elem *b, void *aux 
    return false;
 
 }
-
+/* Compare thread priority, used by ready_list */
+bool cmp_priority(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED)
+{
+   struct thread *ta = list_entry(a, struct thread, elem);
+   struct thread *tb = list_entry(b, struct thread, elem);
+   return ta->priority > tb->priority;
+}
 
 /* Let current running thread sleep for TIMER ticks by pushing
    current thread to sleeping list, set status as Thread sleeping
@@ -272,8 +278,17 @@ thread_unblock (struct thread *t)
 
   old_level = intr_disable ();
   ASSERT (t->status == THREAD_BLOCKED);
-  list_push_back (&ready_list, &t->elem);
+  /* When a thread is added to the ready list that has a higher priority
+     than the currently running thread, the current thread should immediately
+     yield the processor to the new thread.
+  */
+  struct thread *cur = thread_current();
+//  list_push_back (&ready_list, &t->elem);
+  list_insert_ordered(&ready_list, &t->elem, cmp_priority, NULL);
   t->status = THREAD_READY;
+  if (t->priority > cur->priority && cur != idle_thread){
+      thread_yield();
+  }
   intr_set_level (old_level);
 }
 
@@ -342,8 +357,10 @@ thread_yield (void)
   ASSERT (!intr_context ());
 
   old_level = intr_disable ();
-  if (cur != idle_thread) 
-    list_push_back (&ready_list, &cur->elem);
+//Add code here: make the ready_list as order queue
+  if (cur != idle_thread)
+     list_insert_ordered (&ready_list, &cur->elem, cmp_priority, NULL); 
+   // list_push_back (&ready_list, &cur->elem);
   cur->status = THREAD_READY;
   schedule ();
   intr_set_level (old_level);
