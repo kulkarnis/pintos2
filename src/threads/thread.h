@@ -4,6 +4,9 @@
 #include <debug.h>
 #include <list.h>
 #include <stdint.h>
+
+/*****************Added*****************/
+#include "synch.h"
 /* List of sleeping thread*/
 static struct list sleeping_list;
 
@@ -106,7 +109,9 @@ struct thread
    
     /* add wake time to thread struct */
    int64_t wake_time;
-
+   
+  /*Added lock*/
+   struct lock *thread_lock;
   };
 
 /* If false (default), use round-robin scheduler.
@@ -148,4 +153,5 @@ int thread_get_load_avg (void);
 /* the implementation of time sleep,Added functions*/
 void thread_sleep(int64_t ticks);
 bool cmp_ticks (const struct list_elem *a, const struct list_elem *b, void * aux UNUSED);
+bool cmp_priority(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED);
 #endif /* threads/thread.h */

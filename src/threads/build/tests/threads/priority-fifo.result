@@ -1,2 +1,5 @@
 FAIL
-No iterations found in output.
+Kernel panic in run: PANIC at ../../lib/kernel/list.c:282 in list_front(): assertion `!list_empty (list)' failed.
+Call stack: 0xc00285de
+Translation of call stack:
+0xc00285de: debug_panic (.../../lib/kernel/debug.c:38)

@@ -94,7 +94,6 @@ bool cmp_priority(const struct list_elem *a, const struct list_elem *b, void *au
    struct thread *tb = list_entry(b, struct thread, elem);
    return ta->priority > tb->priority;
 }
-
 /* Let current running thread sleep for TIMER ticks by pushing
    current thread to sleeping list, set status as Thread sleeping
    and wake time as current time plus ticks
@@ -384,10 +383,16 @@ thread_foreach (thread_action_func *func, void *aux)
 }
 
 /* Sets the current thread's priority to NEW_PRIORITY. */
+/* 1.To pass priority change test, verify that lowering a thread's priority so that it is 
+     no longer the highest-priority thread in the system causes it to yield immediately.
+*/
 void
 thread_set_priority (int new_priority) 
 {
   thread_current ()->priority = new_priority;
+  if (thread_current()->priority < list_front (&ready_list)){
+     thread_yield();
+  }
 }
 
 /* Returns the current thread's priority. */

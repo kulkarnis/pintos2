@@ -1,11 +1,11 @@
-qemu -hda /tmp/965TB_F57w.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/O8Xycj_NIN.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading.........
 Kernel command line: -q run priority-preempt
 Pintos booting with 4,088 kB RAM...
 382 pages available in kernel pool.
 382 pages available in user pool.
-Calibrating timer...  130,867,200 loops/s.
+Calibrating timer...  99,840,000 loops/s.
 Boot complete.
 Executing 'priority-preempt':
 (priority-preempt) begin
@@ -19,7 +19,7 @@ Executing 'priority-preempt':
 (priority-preempt) end
 Execution of 'priority-preempt' complete.
 Timer: 26 ticks
-Thread: 0 idle ticks, 26 kernel ticks, 0 user ticks
-Console: 778 characters output
+Thread: 0 idle ticks, 27 kernel ticks, 0 user ticks
+Console: 777 characters output
 Keyboard: 0 keys pressed
 Powering off...
