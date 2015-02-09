@@ -119,7 +119,6 @@ sema_up (struct semaphore *sema)
       list_remove(e);
       struct  thread *t = list_entry (e, struct thread, elem);
       thread_unblock (t);
-      yield_to_new_thread (t);
 //      if ( t->priority > thread_current()->priority){
 //           thread_yield();
       }
