@@ -121,7 +121,7 @@ sema_up (struct semaphore *sema)
       thread_unblock (t);
 //      if ( t->priority > thread_current()->priority){
 //           thread_yield();
-      }
+      
   }
   //  thread_unblock (list_entry (list_pop_front (&sema->waiters),
   //                              struct thread, elem));

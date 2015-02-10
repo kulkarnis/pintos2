@@ -110,8 +110,6 @@ struct thread
     /* add wake time to thread struct */
    int64_t wake_time;
    
-  /*Added lock*/
-   struct lock *thread_lock;
   };
 
 /* If false (default), use round-robin scheduler.
