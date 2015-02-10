@@ -1,11 +1,11 @@
-qemu -hda /tmp/E1HbxoeffJ.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/FfjaRZpn4E.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading.........
 Kernel command line: -q run priority-donate-one
 Pintos booting with 4,088 kB RAM...
 382 pages available in kernel pool.
 382 pages available in user pool.
-Calibrating timer...  101,478,400 loops/s.
+Calibrating timer...  77,312,000 loops/s.
 Boot complete.
 Executing 'priority-donate-one':
 (priority-donate-one) begin
@@ -15,8 +15,23 @@ Executing 'priority-donate-one':
 (priority-donate-one) This should be the last line before finishing this test.
 (priority-donate-one) end
 Execution of 'priority-donate-one' complete.
-Timer: 27 ticks
-Thread: 0 idle ticks, 27 kernel ticks, 0 user ticks
-Console: 737 characters output
+Timer: 31 ticks
+Thread: 0 idle ticks, 31 kernel ticks, 0 user ticks
+Unexpected interrupt 0x0e (#PF Page-Fault Exception)
+Unexpected interrupt 0x0e (#PF Page-Fault Exception)
+Unexpected interrupt 0x0e (#PF Page-Fault Exception)
+Unexpected interrupt 0x0e (#PF Page-Fault Exception)
+Unexpected interrupt 0x0e (#PF Page-Fault Exception)
+Unexpected interrupt 0x0e (#PF Page-Fault Exception)
+Unexpected interrupt 0x0e (#PF Page-Fault Exception)
+(priority-donate-one) acquire1: got the lock
+Kernel PANIC at ../../threads/synch.c:246 in lock_release(): assertion `lock_held_by_current_thread (lock)' failed.
+Call stack: 0xc00285be.
+The `backtrace' program can make call stacks useful.
+Read "Backtraces" in the "Debugging Tools" chapter
+of the Pintos documentation for more information.
+Timer: 36 ticks
+Thread: 0 idle ticks, 36 kernel ticks, 0 user ticks
+Console: 1514 characters output
 Keyboard: 0 keys pressed
 Powering off...

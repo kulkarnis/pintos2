@@ -1,4 +1,4 @@
-qemu -hda /tmp/KHvDVMuDxR.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/XHSc5oPiDb.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading.........
 Kernel command line: -q run priority-donate-lower
@@ -12,7 +12,7 @@ Executing 'priority-donate-lower':
 (priority-donate-lower) Main thread should have priority 41.  Actual priority: 31.
 (priority-donate-lower) Lowering base priority...
 Kernel PANIC at ../../lib/kernel/list.c:282 in list_front(): assertion `!list_empty (list)' failed.
-Call stack: 0xc00285de.
+Call stack: 0xc00285be.
 The `backtrace' program can make call stacks useful.
 Read "Backtraces" in the "Debugging Tools" chapter
 of the Pintos documentation for more information.

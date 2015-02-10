@@ -1,11 +1,11 @@
-qemu -hda /tmp/4Br1kd8LG5.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/zQs4u2mEfm.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading.........
 Kernel command line: -q run priority-donate-multiple2
 Pintos booting with 4,088 kB RAM...
 382 pages available in kernel pool.
 382 pages available in user pool.
-Calibrating timer...  104,857,600 loops/s.
+Calibrating timer...  104,755,200 loops/s.
 Boot complete.
 Executing 'priority-donate-multiple2':
 (priority-donate-multiple2) begin
@@ -16,9 +16,21 @@ Executing 'priority-donate-multiple2':
 (priority-donate-multiple2) Threads b, a, c should have just finished, in that order.
 (priority-donate-multiple2) Main thread should have priority 31.  Actual priority: 31.
 (priority-donate-multiple2) end
-Execution of 'priority-donate-multiple2' complete.
-Timer: 38 ticks
-Thread: 0 idle ticks, 39 kernel ticks, 0 user ticks
-Console: 923 characters output
+Unexpected interrupt 0x0e (#PF Page-Fault Exception)
+Unexpected interrupt 0x0e (#PF Page-Fault Exception)
+Unexpected interrupt 0x0e (#PF Page-Fault Exception)
+Unexpected interrupt 0x0e (#PF Page-Fault Exception)
+Unexpected interrupt 0x0e (#PF Page-Fault Exception)
+Unexpected interrupt 0x0e (#PF Page-Fault Exception)
+Unexpected interrupt 0x0e (#PF Page-Fault Exception)
+(priority-donate-multiple2) Thread b acquired lock b.
+Kernel PANIC at ../../threads/synch.c:246 in lock_release(): assertion `lock_held_by_current_thread (lock)' failed.
+Call stack: 0xc00285be.
+The `backtrace' program can make call stacks useful.
+Read "Backtraces" in the "Debugging Tools" chapter
+of the Pintos documentation for more information.
+Timer: 32 ticks
+Thread: 0 idle ticks, 32 kernel ticks, 0 user ticks
+Console: 1591 characters output
 Keyboard: 0 keys pressed
 Powering off...

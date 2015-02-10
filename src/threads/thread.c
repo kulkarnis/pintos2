@@ -110,6 +110,14 @@ void thread_sleep(int64_t ticks){
        intr_set_level(old_level);
     }
 }
+void 
+yield_to_max_priority_thread(struct thread *t)
+{
+    if (t->priority > thread_current()->priority && thread_current() != idle_thread){
+      thread_yield();
+  }
+ 
+}
 /* Initializes the threading system by transforming the code
    that's currently running into a thread.  This can't work in
    general and it is possible in this case only because loader.S
@@ -240,7 +248,7 @@ thread_create (const char *name, int priority,
 
   /* Add to run queue. */
   thread_unblock (t);
-
+  yield_to_max_priority_thread (t);
   return tid;
 }
 
@@ -285,10 +293,7 @@ thread_unblock (struct thread *t)
 //  list_push_back (&ready_list, &t->elem);
   list_insert_ordered(&ready_list, &t->elem, cmp_priority, NULL);
   t->status = THREAD_READY;
-  if (t->priority > cur->priority && cur != idle_thread){
-      thread_yield();
-  }
-  intr_set_level (old_level);
+ intr_set_level (old_level);
 }
 
 /* Returns the name of the running thread. */
