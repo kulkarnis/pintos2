@@ -1,5 +1,2 @@
 FAIL
-Kernel panic in run: PANIC at ../../lib/kernel/list.c:282 in list_front(): assertion `!list_empty (list)' failed.
-Call stack: 0xc00285be
-Translation of call stack:
-0xc00285be: debug_panic (.../../lib/kernel/debug.c:38)
+First iteration does not list all threads 0...15

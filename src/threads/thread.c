@@ -111,11 +111,25 @@ void thread_sleep(int64_t ticks){
     }
 }
 void 
-yield_to_max_priority_thread(struct thread *t)
+yield_to_max_priority_thread(void)
 {
-    if (t->priority > thread_current()->priority && thread_current() != idle_thread){
-      thread_yield();
-  }
+//    if (t->priority > thread_current()->priority && thread_current() != idle_thread){
+//      thread_yield();
+//  }
+   if (list_empty (&ready_list)){
+       return;
+   }
+   struct thread *t = list_entry(list_front (&ready_list), struct thread, elem);   
+   if (intr_context()){
+      thread_ticks++;
+      if (thread_current ()->priority < t->priority || (thread_ticks >= TIME_SLICE && thread_current()->priority == t->priority)){
+          intr_yield_on_return();
+      }
+   }
+   
+   if (thread_current ()->priority < t->priority){
+       thread_yield(); 
+   }
  
 }
 /* Initializes the threading system by transforming the code
@@ -219,7 +233,7 @@ thread_create (const char *name, int priority,
   struct switch_entry_frame *ef;
   struct switch_threads_frame *sf;
   tid_t tid;
-
+  enum intr_level old_level;
   ASSERT (function != NULL);
 
   /* Allocate thread. */
@@ -230,7 +244,8 @@ thread_create (const char *name, int priority,
   /* Initialize thread. */
   init_thread (t, name, priority);
   tid = t->tid = allocate_tid ();
-
+  
+   old_level = intr_disable();
   /* Stack frame for kernel_thread(). */
   kf = alloc_frame (t, sizeof *kf);
   kf->eip = NULL;
@@ -245,10 +260,14 @@ thread_create (const char *name, int priority,
   sf = alloc_frame (t, sizeof *sf);
   sf->eip = switch_entry;
   sf->ebp = 0;
-
+  intr_set_level (old_level);
   /* Add to run queue. */
   thread_unblock (t);
-  yield_to_max_priority_thread (t);
+
+  old_level = intr_disable ();
+  yield_to_max_priority_thread ();
+  intr_set_level (old_level);
+
   return tid;
 }
 
@@ -289,7 +308,7 @@ thread_unblock (struct thread *t)
      than the currently running thread, the current thread should immediately
      yield the processor to the new thread.
   */
-  struct thread *cur = thread_current();
+//  struct thread *cur = thread_current();
 //  list_push_back (&ready_list, &t->elem);
   list_insert_ordered(&ready_list, &t->elem, cmp_priority, NULL);
   t->status = THREAD_READY;
@@ -394,10 +413,18 @@ thread_foreach (thread_action_func *func, void *aux)
 void
 thread_set_priority (int new_priority) 
 {
-  thread_current ()->priority = new_priority;
-  if (thread_current()->priority < list_front (&ready_list)){
-     thread_yield();
-  }
+   enum intr_level old_level = intr_disable();
+   int old_priority = thread_current()->priority;
+   refresh_priority();
+   if (old_priority < thread_current()->priority)
+   {
+      donate_priority();
+   }
+
+   if (old_priority > thread_current()->priority){
+     yield_to_max_priority_thread();
+   }
+   intr_set_level (old_level);
 }
 
 /* Returns the current thread's priority. */
@@ -529,6 +556,11 @@ init_thread (struct thread *t, const char *name, int priority)
   old_level = intr_disable ();
   list_push_back (&all_list, &t->allelem);
   intr_set_level (old_level);
+ 
+   // Add initialization for priority donation
+  t->base_priority = priority;
+  t->wait_on_lock = NULL;
+  list_init (&t->donation_list);
 }
 
 /* Allocates a SIZE-byte frame at the top of thread T's stack and
@@ -675,3 +707,58 @@ allocate_tid (void)
    Used by switch.S, which can't figure it out on its own. */
 uint32_t thread_stack_ofs = offsetof (struct thread, stack);
 
+/* added code here */
+void
+donate_priority (void)
+{
+   int depth = 0;
+   struct thread *cur = thread_current();
+   struct lock *lc = cur->wait_on_lock;
+   while ( lc && depth < 8 )
+   {
+      depth++;
+      if (!lc->holder)
+       {
+          return;
+       }
+      if (lc->holder->priority >= cur->priority)
+       {
+          return;
+       }
+       lc->holder->priority = cur->priority;
+       cur = lc->holder;
+       lc = cur->wait_on_lock;
+   }  
+}
+
+void
+remove_with_lock (struct lock *lock)
+{
+   struct list_elem *e = list_begin (&thread_current()->donation_list);
+   struct list_elem *next;
+   while (e != list_end (&thread_current()->donation_list))
+   {
+     struct thread *t = list_entry (e, struct thread, donation_elem);
+     next = list_next(e);
+     if (t->wait_on_lock == lock){
+      list_remove (e); 
+     }
+     e = next;
+   }
+}
+void
+refresh_priority (void)
+{
+   struct thread *cur = thread_current();
+   cur->priority = cur->base_priority;
+   if (list_empty (&cur->donation_list))
+     {
+        return;
+     }
+   struct thread *t = list_entry (list_front(&cur->donation_list), struct thread, donation_elem);
+   if (t->priority > cur->priority)
+  {
+     cur->priority = t->priority;
+  }
+
+}

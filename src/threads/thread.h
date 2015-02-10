@@ -109,7 +109,11 @@ struct thread
    
     /* add wake time to thread struct */
    int64_t wake_time;
-   
+   /* added struct, used for scheduling prioirity */
+   int base_priority;
+   struct lock *wait_on_lock;
+   struct list donation_list;
+   struct list_elem donation_elem;
   };
 
 /* If false (default), use round-robin scheduler.
@@ -152,4 +156,8 @@ int thread_get_load_avg (void);
 void thread_sleep(int64_t ticks);
 bool cmp_ticks (const struct list_elem *a, const struct list_elem *b, void * aux UNUSED);
 bool cmp_priority(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED);
+void yield_to_max_priority_thread(void);
+void donate_priority (void);
+void remove_with_lock (struct lock *lock);
+void refresh_priority (void);
 #endif /* threads/thread.h */

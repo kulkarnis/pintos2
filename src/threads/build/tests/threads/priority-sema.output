@@ -1,21 +1,28 @@
-qemu -hda /tmp/Q1qey0rBXp.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/fjyql21g_a.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading.........
 Kernel command line: -q run priority-sema
 Pintos booting with 4,088 kB RAM...
 382 pages available in kernel pool.
 382 pages available in user pool.
-Calibrating timer...  98,201,600 loops/s.
+Calibrating timer...  86,732,800 loops/s.
 Boot complete.
 Executing 'priority-sema':
 (priority-sema) begin
-Kernel PANIC at ../../lib/kernel/list.c:282 in list_front(): assertion `!list_empty (list)' failed.
-Call stack: 0xc00285be.
-The `backtrace' program can make call stacks useful.
-Read "Backtraces" in the "Debugging Tools" chapter
-of the Pintos documentation for more information.
-Timer: 25 ticks
-Thread: 0 idle ticks, 25 kernel ticks, 0 user ticks
-Console: 600 characters output
+(priority-sema) Back in main thread.
+(priority-sema) Back in main thread.
+(priority-sema) Back in main thread.
+(priority-sema) Back in main thread.
+(priority-sema) Back in main thread.
+(priority-sema) Back in main thread.
+(priority-sema) Back in main thread.
+(priority-sema) Back in main thread.
+(priority-sema) Back in main thread.
+(priority-sema) Back in main thread.
+(priority-sema) end
+Execution of 'priority-sema' complete.
+Timer: 31 ticks
+Thread: 0 idle ticks, 32 kernel ticks, 0 user ticks
+Console: 751 characters output
 Keyboard: 0 keys pressed
 Powering off...
