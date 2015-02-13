@@ -88,11 +88,11 @@ bool cmp_ticks (const struct list_elem *a, const struct list_elem *b, void *aux 
 
 }
 /* Compare thread priority, used by ready_list */
-bool cmp_priority(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED)
+bool cmp_priority(const struct list_elem *ele1, const struct list_elem *ele2, void *aux UNUSED)
 {
-   struct thread *ta = list_entry(a, struct thread, elem);
-   struct thread *tb = list_entry(b, struct thread, elem);
-   return ta->priority > tb->priority;
+   struct thread *thread_1 = list_entry(ele1, struct thread, elem);
+   struct thread *thread_2 = list_entry(ele2, struct thread, elem);
+   return thread_1->priority > thread_2->priority;
 }
 /* Let current running thread sleep for TIMER ticks by pushing
    current thread to sleeping list, set status as Thread sleeping
@@ -415,6 +415,7 @@ thread_set_priority (int new_priority)
 {
    enum intr_level old_level = intr_disable();
    int old_priority = thread_current()->priority;
+   thread_current ()->base_priority = new_priority;
    refresh_priority();
    if (old_priority < thread_current()->priority)
    {
@@ -713,21 +714,21 @@ donate_priority (void)
 {
    int depth = 0;
    struct thread *cur = thread_current();
-   struct lock *lc = cur->wait_on_lock;
-   while ( lc && depth < 8 )
+   struct lock *current_wait_lock = cur->wait_on_lock;
+   while ( current_wait_lock && depth < 8 )
    {
       depth++;
-      if (!lc->holder)
+      if (!current_wait_lock->holder)
        {
           return;
        }
-      if (lc->holder->priority >= cur->priority)
+      if (current_wait_lock->holder->priority < cur->priority)
        {
-          return;
+          current_wait_lock->holder->priority = cur->priority; 
+          cur = current_wait_lock->holder;
+          current_wait_lock = cur->wait_on_lock;
        }
-       lc->holder->priority = cur->priority;
-       cur = lc->holder;
-       lc = cur->wait_on_lock;
+         
    }  
 }
 
