@@ -110,10 +110,20 @@ struct thread
     /* add wake time to thread struct */
    int64_t wake_time;
    /* added struct, used for scheduling prioirity */
-   int base_priority;
-   struct lock *wait_on_lock;
-   struct list donation_list;
-   struct list_elem donation_elem;
+   /* to keep track of initial priority after donation*/
+   int init_priority;
+   /* mainly used to keep track of previous lock holder,
+      especialy useful to deal with nest lock, and chain lock
+      situation.
+    */
+   struct lock *waiting_lock;
+   /* This data structure is used to handle multiple donation 
+      situation, when main thread hold multiple locks, it is necessary
+      to keep track of all donor so that the main thread can revert back
+      to right priority instead of initial priority.
+   */
+   struct list donor_list;
+   struct list_elem donor_elem;
   };
 
 /* If false (default), use round-robin scheduler.
@@ -158,6 +168,6 @@ bool cmp_ticks (const struct list_elem *a, const struct list_elem *b, void * aux
 bool cmp_priority(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED);
 void yield_to_max_priority_thread(void);
 void donate_priority (void);
-void remove_with_lock (struct lock *lock);
-void refresh_priority (void);
+void refresh_donor_list (struct lock *lock);
+void update_priority (void);
 #endif /* threads/thread.h */

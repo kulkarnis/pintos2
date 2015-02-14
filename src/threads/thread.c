@@ -415,8 +415,8 @@ thread_set_priority (int new_priority)
 {
    enum intr_level old_level = intr_disable();
    int old_priority = thread_current()->priority;
-   thread_current ()->base_priority = new_priority;
-   refresh_priority();
+   thread_current ()->init_priority = new_priority;
+   update_priority();
    if (old_priority < thread_current()->priority)
    {
       donate_priority();
@@ -559,9 +559,9 @@ init_thread (struct thread *t, const char *name, int priority)
   intr_set_level (old_level);
  
    // Add initialization for priority donation
-  t->base_priority = priority;
-  t->wait_on_lock = NULL;
-  list_init (&t->donation_list);
+  t->init_priority = priority;
+  t->waiting_lock = NULL;
+  list_init (&t->donor_list);
 }
 
 /* Allocates a SIZE-byte frame at the top of thread T's stack and
@@ -708,58 +708,75 @@ allocate_tid (void)
    Used by switch.S, which can't figure it out on its own. */
 uint32_t thread_stack_ofs = offsetof (struct thread, stack);
 
-/* added code here */
+/* Case 1: the simple situation is there are two threads, one lock holder
+   thread with lower priority, one waiting lock thread with higher priority.
+   Update the holder's priority as waiting lock thread's prioirity.
+   Case 2: for the nest lock situation, iteratively update previous lock holder's
+   priority until its waiting lock is null.
+ */
 void
 donate_priority (void)
 {
    int depth = 0;
-   struct thread *cur = thread_current();
-   struct lock *current_wait_lock = cur->wait_on_lock;
-   while ( current_wait_lock && depth < 8 )
-   {
-      depth++;
-      if (!current_wait_lock->holder)
-       {
-          return;
-       }
-      if (current_wait_lock->holder->priority < cur->priority)
-       {
-          current_wait_lock->holder->priority = cur->priority; 
-          cur = current_wait_lock->holder;
-          current_wait_lock = cur->wait_on_lock;
-       }
-         
-   }  
-}
+   struct thread *current_thread = thread_current();
+   struct lock *waiting_lc = current_thread->waiting_lock;
+   while (waiting_lc && depth < 8){
+      if (!waiting_lc->holder){
+         return;
+      }
+      if (waiting_lc->holder->priority < current_thread->priority){
+          waiting_lc->holder->priority = current_thread->priority;
+          current_thread = waiting_lc->holder;
+          waiting_lc = current_thread->waiting_lock;
+      }
+   }
+//while ( current_wait_lock && depth < 8 )
 
+//  depth++;
+//  if (!current_wait_lock->holder)
+//   {
+//      return;
+//   }
+//  if (current_wait_lock->holder->priority < cur->priority)
+//   {
+//      current_wait_lock->holder->priority = cur->priority; 
+//      cur = current_wait_lock->holder;
+//      current_wait_lock = cur->wait_on_lock;
+//   }
+     
+  
+}
+/* To handle multiple donation, we need to remvove the thread which
+   are waiting for this lock when realeasing this lock.
+*/
 void
-remove_with_lock (struct lock *lock)
+refresh_donor_list (struct lock *lock)
 {
-   struct list_elem *e = list_begin (&thread_current()->donation_list);
+   struct list_elem *e = list_begin (&thread_current()->donor_list);
    struct list_elem *next;
-   while (e != list_end (&thread_current()->donation_list))
+   while (e != list_end (&thread_current()->donor_list))
    {
-     struct thread *t = list_entry (e, struct thread, donation_elem);
+     struct thread *t = list_entry (e, struct thread, donor_elem);
      next = list_next(e);
-     if (t->wait_on_lock == lock){
+     if (t->waiting_lock == lock){
       list_remove (e); 
      }
      e = next;
    }
 }
 void
-refresh_priority (void)
+update_priority (void)
 {
-   struct thread *cur = thread_current();
-   cur->priority = cur->base_priority;
-   if (list_empty (&cur->donation_list))
+   struct thread *current_thread = thread_current();
+   current_thread->priority = current_thread->init_priority;
+   if (list_empty (&current_thread->donor_list))
      {
         return;
      }
-   struct thread *t = list_entry (list_front(&cur->donation_list), struct thread, donation_elem);
-   if (t->priority > cur->priority)
+   struct thread *front_thread = list_entry (list_front(&current_thread->donor_list), struct thread, donor_elem);
+   if (front_thread->priority > current_thread->priority)
   {
-     cur->priority = t->priority;
+     current_thread->priority = front_thread->priority;
   }
 
 }

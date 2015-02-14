@@ -1,4 +1,4 @@
-qemu -hda /tmp/u4TPHp_jxK.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/HVfF0ASxqO.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading.........
 Kernel command line: -q run priority-preempt
@@ -18,8 +18,8 @@ Executing 'priority-preempt':
 (priority-preempt) The high-priority thread should have already completed.
 (priority-preempt) end
 Execution of 'priority-preempt' complete.
-Timer: 28 ticks
-Thread: 0 idle ticks, 28 kernel ticks, 0 user ticks
+Timer: 24 ticks
+Thread: 0 idle ticks, 24 kernel ticks, 0 user ticks
 Console: 778 characters output
 Keyboard: 0 keys pressed
 Powering off...

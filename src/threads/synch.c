@@ -215,11 +215,11 @@ lock_acquire (struct lock *lock)
   ASSERT (!lock_held_by_current_thread (lock));
   enum intr_level old_level = intr_disable();
   if ( lock->holder){
-     thread_current()->wait_on_lock = lock;
-     list_insert_ordered (&lock->holder->donation_list, &thread_current()->donation_elem, cmp_priority, NULL);   
+     thread_current()->waiting_lock = lock;
+     list_insert_ordered (&lock->holder->donor_list, &thread_current()->donor_elem, cmp_priority, NULL);   
   } 
   sema_down (&lock->semaphore);
-  thread_current()->wait_on_lock = NULL;
+  thread_current()->waiting_lock = NULL;
   lock->holder = thread_current ();
   intr_set_level (old_level);
 }
@@ -257,8 +257,8 @@ lock_release (struct lock *lock)
   enum intr_level old_level = intr_disable(); 
  
   lock->holder = NULL;
-  remove_with_lock (lock);
-  refresh_priority();
+  refresh_donor_list (lock);
+  update_priority();
   sema_up (&lock->semaphore);
   intr_set_level (old_level);
 }
@@ -382,8 +382,8 @@ cond_waiting_thread_priority_cmp (const struct list_elem *elem1, const struct li
     if (list_empty (&sema2->waiters)){
         return false;
     }
-    list_sort (&sema1->waiters, cmp_priority, NULL);
-    list_sort (&sema2->waiters, cmp_priority, NULL);
+//    list_sort (&sema1->waiters, cmp_priority, NULL);
+//    list_sort (&sema2->waiters, cmp_priority, NULL);
     struct thread * t2 = list_entry (list_front (&sema2->waiters), struct thread, elem);
     struct thread * t1 = list_entry (list_front(&sema1->waiters), struct thread, elem); 
      
