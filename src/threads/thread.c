@@ -120,12 +120,12 @@ yield_to_max_priority_thread(void)
        return;
    }
    struct thread *t = list_entry(list_front (&ready_list), struct thread, elem);   
-   if (intr_context()){
-      thread_ticks++;
-      if (thread_current ()->priority < t->priority || (thread_ticks >= TIME_SLICE && thread_current()->priority == t->priority)){
-          intr_yield_on_return();
-      }
-   }
+//   if (intr_context()){
+//      thread_ticks++;
+//      if (thread_current ()->priority < t->priority || (thread_ticks >= TIME_SLICE && thread_current()->priority == t->priority)){
+//          intr_yield_on_return();
+//      }
+//   }
    
    if (thread_current ()->priority < t->priority){
        thread_yield(); 
@@ -730,21 +730,6 @@ donate_priority (void)
           waiting_lc = current_thread->waiting_lock;
       }
    }
-//while ( current_wait_lock && depth < 8 )
-
-//  depth++;
-//  if (!current_wait_lock->holder)
-//   {
-//      return;
-//   }
-//  if (current_wait_lock->holder->priority < cur->priority)
-//   {
-//      current_wait_lock->holder->priority = cur->priority; 
-//      cur = current_wait_lock->holder;
-//      current_wait_lock = cur->wait_on_lock;
-//   }
-     
-  
 }
 /* To handle multiple donation, we need to remvove the thread which
    are waiting for this lock when realeasing this lock.

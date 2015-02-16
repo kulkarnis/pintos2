@@ -1,4 +1,4 @@
-qemu -hda /tmp/PZjcgpzq8Z.dsk -m 4 -net none -nographic -monitor null
+qemu -hda /tmp/yZD4cBpPWV.dsk -m 4 -net none -nographic -monitor null
 PiLo hda1
 Loading.........
 Kernel command line: -q run priority-donate-one
@@ -20,7 +20,7 @@ Executing 'priority-donate-one':
 (priority-donate-one) end
 Execution of 'priority-donate-one' complete.
 Timer: 28 ticks
-Thread: 0 idle ticks, 28 kernel ticks, 0 user ticks
+Thread: 0 idle ticks, 29 kernel ticks, 0 user ticks
 Console: 901 characters output
 Keyboard: 0 keys pressed
 Powering off...
