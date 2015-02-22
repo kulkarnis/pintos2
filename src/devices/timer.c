@@ -85,35 +85,21 @@ timer_elapsed (int64_t then)
 }
 
 /* Sleeps for approximately TICKS timer ticks.  Interrupts must
-   be turned on. */
+   be turned on.
+
+   Check the input ticks is non negative first.
+   Call the thread_sleep which will put the thread  to sleep
+   for the intended time.
+ */
 void
 timer_sleep (int64_t ticks) 
 {
- /* int64_t start = timer_ticks ();
-
-  ASSERT (intr_get_level () == INTR_ON);
-  while (timer_elapsed (start) < ticks) 
-    thread_yield ();
- */
    ASSERT (intr_get_level () == INTR_ON);
    if (ticks <= 0)
      {
         return;
      }
    thread_sleep(ticks);
-   /* Turn interrupts off temporarily to:
-     - calculate ticks to stop sleep
-     - add thread to sleep list
-     - block thread 
-   */
-/*  
-  enum intr_level old_level = intr_disable ();
-  thread_current()->wake_time = timer_ticks() + ticks;
-  list_insert_ordered(&sleeping_list, &thread_current()->elem,
-                      (list_less_func *)&cmp_ticks, NULL);
-  thread_block();
-  intr_set_level(old_level);
-*/  
 }
 
 /* Sleeps for approximately MS milliseconds.  Interrupts must be

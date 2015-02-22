@@ -5,10 +5,7 @@
 #include <list.h>
 #include <stdint.h>
 
-/*****************Added*****************/
 #include "synch.h"
-/* List of sleeping thread*/
-static struct list sleeping_list;
 
 /* States in a thread's life cycle. */
 enum thread_status
