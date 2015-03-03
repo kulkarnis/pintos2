@@ -14,6 +14,7 @@
 #include "threads/vaddr.h"
 #ifdef USERPROG
 #include "userprog/process.h"
+#include "userprog/syscall.h"
 #endif
 
 /* Random value for struct thread's `magic' member.
@@ -256,6 +257,13 @@ thread_create (const char *name, int priority,
   sf->eip = switch_entry;
   sf->ebp = 0;
   intr_set_level (old_level);
+
+  //Adding code for Userprog
+  //adding child process
+  t->parent = thread_tid();
+  struct child_process *chp = add_child(t->tid);
+  t->chp = chp;
+
   /* Add to run queue. */
   thread_unblock (t);
   /* When creating and initializing new thread, once it owns highest 
@@ -352,14 +360,18 @@ thread_exit (void)
   process_exit ();
 #endif
 
+//printf("exit...\n");
   /* Remove thread from all threads list, set our status to dying,
      and schedule another process.  That process will destroy us
      when it calls thread_schedule_tail(). */
   intr_disable ();
   list_remove (&thread_current()->allelem);
   thread_current ()->status = THREAD_DYING;
+  
   schedule ();
+  
   NOT_REACHED ();
+  //printf("Exit ends..\n");
 }
 
 /* Yields the CPU.  The current thread is not put to sleep and
@@ -544,15 +556,26 @@ init_thread (struct thread *t, const char *name, int priority)
   t->stack = (uint8_t *) t + PGSIZE;
   t->priority = priority;
   t->magic = THREAD_MAGIC;
-
-  old_level = intr_disable ();
-  list_push_back (&all_list, &t->allelem);
-  intr_set_level (old_level);
  
    // Add initialization for priority donation
   t->init_priority = priority;
   t->waiting_lock = NULL;
   list_init (&t->donor_list);
+
+  //initialise for userprog
+  list_init (&t->child_list);
+  t->chp = NULL;
+  t->parent = running_thread ();
+  cond_init (&t->child_condition);
+  lock_init (&t->child_cond_lock);
+  list_init (&t->files_owned_list);
+  t->file_desc = 2;
+
+
+  old_level = intr_disable ();
+  list_push_back (&all_list, &t->allelem);
+  intr_set_level (old_level);
+
 }
 
 /* Allocates a SIZE-byte frame at the top of thread T's stack and
@@ -761,4 +784,24 @@ update_priority (void)
    {
       current_thread->priority = front_thread->priority;
    }
+}
+
+
+//check if process for given pid exists in all_list
+bool
+thread_exist_in_all_list (int pid)
+{
+   struct list_elem *e = list_begin (&all_list);
+   struct list_elem *next;
+   while (e != list_end (&all_list))
+   {
+     struct thread *t = list_entry (e, struct thread, allelem);
+     next = list_next(e);
+     if (t->tid == pid)
+      {
+        return true; 
+      }
+     e = next;
+   }
+   return false;
 }

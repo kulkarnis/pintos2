@@ -17,6 +17,18 @@ enum thread_status
     THREAD_DYING        /* About to be destroyed. */
   };
 
+//Adding child struct 
+   struct child_process
+    {
+      int pid;    //pid of thread
+      int load;   // load status code
+      int status; // exit status code
+      bool wait;  // for waiting purpose
+      bool exit;  // for exit checking
+      struct lock wait_lock;
+      struct list_elem elem;
+    };
+
 /* Thread identifier type.
    You can redefine this to whatever type you like. */
 typedef int tid_t;
@@ -121,6 +133,17 @@ struct thread
    */
    struct list donor_list;
    struct list_elem donor_elem;
+
+   //For project of Userprog
+   struct list child_list;  //keep child processes
+   struct thread *parent;   //keep parent thread
+   struct child_process *chp; //pointer to child_process in parent's list of child
+   struct lock child_cond_lock; //lock associated with cond var of child
+   struct condition child_condition; //cond var for indicating child's status
+   struct list files_owned_list;     //for handling file sys calls we need file list
+   int file_desc; //file discriptor
+
+  
   };
 
 /* If false (default), use round-robin scheduler.

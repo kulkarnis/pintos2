@@ -7,6 +7,7 @@
 #include <string.h>
 #include "userprog/gdt.h"
 #include "userprog/pagedir.h"
+#include "userprog/syscall.h"
 #include "userprog/tss.h"
 #include "filesys/directory.h"
 #include "filesys/file.h"
@@ -19,7 +20,8 @@
 #include "threads/vaddr.h"
 
 static thread_func start_process NO_RETURN;
-static bool load (const char *cmdline, void (**eip) (void), void **esp);
+static bool load (const char *cmdline, void (**eip) (void), void **esp,
+                  char ** fp);
 
 /* Starts a new thread running a user program loaded from
    FILENAME.  The new thread may be scheduled (and may even exit)
@@ -28,6 +30,8 @@ static bool load (const char *cmdline, void (**eip) (void), void **esp);
 tid_t
 process_execute (const char *file_name) 
 {
+  
+  printf("process execute...\n");
   char *fn_copy;
   tid_t tid;
 
@@ -38,11 +42,65 @@ process_execute (const char *file_name)
     return TID_ERROR;
   strlcpy (fn_copy, file_name, PGSIZE);
 
+  //Get file name only without arguments
+  //call to strtok_r gives us first token here which is file name
+  char *fp;
+  file_name = strtok_r((char *)file_name, " ", &fp);
+
+/*
+  //alocating memory for child_process
+  struct child_process *child_p = malloc (sizeof (struct child_process));
+
+  //Check for success
+  if(child_p == NULL)
+     {
+        palloc_free_page (fn_copy);
+        return TID_ERROR;
+     }
+
+  //Add to the list
+  list_push_back (&thread_current ()->child_list, &child_p->elem);
+*/
+
   /* Create a new thread to execute FILE_NAME. */
   tid = thread_create (file_name, PRI_DEFAULT, start_process, fn_copy);
   if (tid == TID_ERROR)
-    palloc_free_page (fn_copy); 
-  return tid;
+     {
+        //remove process from child list
+       // list_remove (&child_p->elem);
+        //free (child_p);
+        palloc_free_page (fn_copy); 
+        return TID_ERROR;  
+     }
+    
+/*
+     //Get child ref pointer
+     struct child_process *child_p  =  &thread_current()->chp;
+    //update child  pid with tid
+     //child_p->pid = tid;
+
+     //Wait for child to get load
+     lock_acquire (&thread_current()->child_cond_lock);
+     int child_load_status = child_p->status;
+     //Wait till status of child gets changes from NOT-LOADED
+     while(child_load_status == NOT_LOADED)
+       {
+          cond_wait (&thread_current()->child_condition,
+                     &thread_current()->child_cond_lock);
+          child_load_status = child_p->status;
+       }
+      lock_release (&thread_current()->child_cond_lock);
+      
+      //Now that load status of child has changed, we check for  FAILED status
+      if(child_load_status == LOAD_FAIL)
+       {
+          list_remove (&child_p->elem);
+          free (child_p);
+          return TID_ERROR;
+       } 
+     //successful loading of child so return tid  
+    return tid; 
+   */  
 }
 
 /* A thread function that loads a user process and starts it
@@ -54,12 +112,33 @@ start_process (void *file_name_)
   struct intr_frame if_;
   bool success;
 
+
+  //Get file name only without arguments
+  //call to strtok_r gives us first token here, which is file name
+  char *fp;
+  file_name = strtok_r(file_name, " ", &fp);
+
+
   /* Initialize interrupt frame and load executable. */
   memset (&if_, 0, sizeof if_);
   if_.gs = if_.fs = if_.es = if_.ds = if_.ss = SEL_UDSEG;
   if_.cs = SEL_UCSEG;
   if_.eflags = FLAG_IF | FLAG_MBS;
-  success = load (file_name, &if_.eip, &if_.esp);
+ 
+ //Will send fp pointer to file to load here
+  success = load (file_name, &if_.eip, &if_.esp, &fp);
+
+  //set status of processes if load successfull
+  if (success == 1)
+     {
+      thread_current ()->chp->load = LOAD_SUCCESS;
+     }
+  else
+    {
+      thread_current ()->chp->load = LOAD_FAIL;
+    }   
+ // printf("Completed load...\n");
+ // printf("success: %d\n", success);
 
   /* If load failed, quit. */
   palloc_free_page (file_name);
@@ -76,6 +155,28 @@ start_process (void *file_name_)
   NOT_REACHED ();
 }
 
+//get process for given pid
+struct child_process * 
+get_process_for_pid (int pid)
+{
+ 
+   struct list_elem *e = list_begin (&thread_current()->child_list);
+   struct list_elem *next;
+   while (e != list_end (&thread_current()->child_list))
+   {
+     struct child_process *chp = list_entry (e, struct child_process,
+                                          elem);
+     next = list_next(e);
+     if (pid == chp->pid)
+       {
+        return chp;
+       }
+     e = next;
+   }
+   return NULL;
+  
+}
+
 /* Waits for thread TID to die and returns its exit status.  If
    it was terminated by the kernel (i.e. killed due to an
    exception), returns -1.  If TID is invalid or if it was not a
@@ -86,18 +187,82 @@ start_process (void *file_name_)
    This function will be implemented in problem 2-2.  For now, it
    does nothing. */
 int
-process_wait (tid_t child_tid UNUSED) 
+process_wait (tid_t child_tid) 
 {
-  return -1;
+  
+  struct child_process *child = get_process_for_pid(child_tid);
+  if(!child)
+  {
+    return -1;
+  }
+  if(child->wait)
+  {
+    return -1;
+  }
+
+  child->wait = true;
+
+  while(!child->exit)
+  {
+    barrier();
+  }
+ // printf("Waiting..\n");
+  int status = child->status;
+ // printf("child status : %d\n",status);
+  list_remove(&child->elem);
+  free(child);
+ // printf("return from wait..\n");
+ return status;
+ 
+ /*
+struct child_process * chp = &thread_current ()->chp;
+lock_acquire (chp->wait_lock);
+
+cond_wait (chp->condition, chp->wait_lock);
+*/
+
+ /*
+ struct child_process * chp = &thread_current ()->chp;
+ //acquire lock
+ lock_acquire (chp->wait_lock);
+
+ //get status from chp
+ if(chp == NULL)
+   {
+    lock_release (chp->wait_lock);
+    return -1;
+   }
+
+  while(!chp->exit)
+   {
+    cond_wait ()
+   } 
+ */
 }
 
 /* Free the current process's resources. */
 void
 process_exit (void)
 {
+
+/*
+ struct child_process * chp = &thread_current ()->chp;
+lock_acquire (chp->wait_lock);
+
+cond_signal (chp->condition, chp->wait_lock);
+*/
+
   struct thread *cur = thread_current ();
   uint32_t *pd;
-
+  
+ // printf("exiting process...\n");  
+  if(thread_exist_in_all_list(cur->parent))
+   {
+      cur->chp->exit = true;  
+   } 
+  
+    
+  
   /* Destroy the current process's page directory and switch back
      to the kernel-only page directory. */
   pd = cur->pagedir;
@@ -195,7 +360,7 @@ struct Elf32_Phdr
 #define PF_W 2          /* Writable. */
 #define PF_R 4          /* Readable. */
 
-static bool setup_stack (void **esp);
+static bool setup_stack (void **esp, const char* file_name, char** fp);
 static bool validate_segment (const struct Elf32_Phdr *, struct file *);
 static bool load_segment (struct file *file, off_t ofs, uint8_t *upage,
                           uint32_t read_bytes, uint32_t zero_bytes,
@@ -206,7 +371,8 @@ static bool load_segment (struct file *file, off_t ofs, uint8_t *upage,
    and its initial stack pointer into *ESP.
    Returns true if successful, false otherwise. */
 bool
-load (const char *file_name, void (**eip) (void), void **esp) 
+load (const char *file_name, void (**eip) (void), void **esp, 
+      char ** fp) 
 {
   struct thread *t = thread_current ();
   struct Elf32_Ehdr ehdr;
@@ -222,6 +388,7 @@ load (const char *file_name, void (**eip) (void), void **esp)
   process_activate ();
 
   /* Open executable file. */
+  
   file = filesys_open (file_name);
   if (file == NULL) 
     {
@@ -241,6 +408,7 @@ load (const char *file_name, void (**eip) (void), void **esp)
       printf ("load: %s: error loading executable\n", file_name);
       goto done; 
     }
+
 
   /* Read program headers. */
   file_ofs = ehdr.e_phoff;
@@ -302,7 +470,8 @@ load (const char *file_name, void (**eip) (void), void **esp)
     }
 
   /* Set up stack. */
-  if (!setup_stack (esp))
+    //passing file stack pointer, file name, and pointer to name
+  if (!setup_stack (esp, file_name, fp))
     goto done;
 
   /* Start address. */
@@ -427,7 +596,7 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
 /* Create a minimal stack by mapping a zeroed page at the top of
    user virtual memory. */
 static bool
-setup_stack (void **esp) 
+setup_stack (void **esp, const char* file_name, char** fp) 
 {
   uint8_t *kpage;
   bool success = false;
@@ -439,9 +608,107 @@ setup_stack (void **esp)
       if (success)
         *esp = PHYS_BASE;
       else
-        palloc_free_page (kpage);
+        {
+          palloc_free_page (kpage);
+          return success;
+        }
     }
-  return success;
+   //moved inside else part above 
+  //return success;
+
+  
+  //adding code here
+    //printf("Setting up stack here...\n");
+    //printf("File name: %s\n", file_name);
+  
+  //pushing on stack
+    char *token;
+    //allocating memory more than a char required
+    char ** argv = malloc (2 * sizeof(char *));
+    int argc = 0;
+    int counter = 2;
+    int i;
+  for(token = (char *) file_name; token != NULL;
+      token = strtok_r (NULL, " ", fp))
+      {
+       // printf("%s\n", token);
+        //decrement esp by length
+        //+1 is for null
+        *esp -= strlen (token) + 1; 
+
+        //add value at esp into argv at argc position
+        argv[argc] = *esp;
+
+        argc++;
+
+        //if more arguments than allocated memory then reallocate memory
+        if (argc > counter)
+           {
+            counter *= 2; //double counter
+            argv = realloc (argv, counter * sizeof (char *));
+           }
+
+        //memory copy
+        memcpy (*esp, token, strlen (token) + 1);
+        printf("%s : %x\n", *esp, *esp);
+      }  
+
+      //padding argv with 0 as
+      //argv[argc] =  0;
+
+      //As we need to copy addresses of args that we have stored now
+      //we need to decrement esp afterwords, by size of char
+      //and to do that we need to make sure that currently stored data
+      //to be multiple of sizeof(char *),
+      //on diff machines it will be 4/8 , so we resize here by 4
+
+      i = (size_t) *esp % 4;
+      //int * ptr = (int *) 0;
+      if(i > 0)
+       {
+        //decrement esp by i
+        *esp -= i;
+        memcpy (*esp, &argv[argc], i);
+
+       }  
+
+      //printf("decrement esp by %d \n",i);
+      //printf("%s : %p\n", *esp, *esp);  
+
+      //Adding Null after all args are saved
+      *esp -= sizeof (char *);
+      memcpy (*esp, &argv[argc], sizeof (char *));
+
+      //copy addresses of all arguments
+      //will start copying addresses from last arg in argv
+      for (i = argc + 1; i >= 0; i--)
+         {
+            *esp -= sizeof (char *);
+            memcpy (*esp, &argv[i], sizeof (char *));
+         }
+
+//       printf("%s : %p\n", *esp, *esp);   
+      //Now we have to store address of arg[0]
+      //esp is pointing currently to arg[0]
+      char *first_arg = *esp;  
+      *esp -= sizeof (char **); //double pointer to access size of arg[0]
+      memcpy (*esp, &first_arg, sizeof (char **));
+
+  //     printf("%s : %x\n", *esp, *esp);
+      //Now storing argc
+      //decrement esp by size of int
+      *esp -= sizeof (int);
+      memcpy (*esp, &argc, sizeof (int));
+
+    //   printf("%s : %x\n", *esp, *esp);
+      //Now adding fake return address
+      //writing NULL pointer in this place
+      *esp -= sizeof (void *);
+      memcpy (*esp, &argv[argc], sizeof (void *));
+
+     //  printf("%s : %x\n", *esp, *esp);
+      //  hex_dump (*esp, *esp, PHYS_BASE - *esp, true);
+    return success;   
 }
 
 /* Adds a mapping from user virtual address UPAGE to kernel
