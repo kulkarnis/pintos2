@@ -31,7 +31,7 @@ tid_t
 process_execute (const char *file_name) 
 {
   
-  printf("process execute...\n");
+  //printf("process execute...\n");
   char *fn_copy;
   tid_t tid;
 
@@ -595,6 +595,7 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
 
 /* Create a minimal stack by mapping a zeroed page at the top of
    user virtual memory. */
+/*
 static bool
 setup_stack (void **esp, const char* file_name, char** fp) 
 {
@@ -710,6 +711,124 @@ setup_stack (void **esp, const char* file_name, char** fp)
       //  hex_dump (*esp, *esp, PHYS_BASE - *esp, true);
     return success;   
 }
+
+*/
+
+/* Create a minimal stack by mapping a zeroed page at the top of
+   user virtual memory. */
+static bool
+setup_stack (void **esp, const char *file_name, char **save_ptr) 
+{
+  //printf("\n setting up stack:..... %s\n", file_name);
+  uint8_t *kpage;
+  bool success = false;
+
+  kpage = palloc_get_page (PAL_USER | PAL_ZERO);
+  if (kpage != NULL) 
+    {
+      success = install_page (((uint8_t *) PHYS_BASE) - PGSIZE, kpage, true);
+      if (success)
+        *esp = PHYS_BASE - 12;
+      else
+        palloc_free_page (kpage);
+    }
+
+ //printf ("\nInitial : %x : %c %d \n",esp, *esp, *esp);
+  
+  //printf ("\n Initial setup_stack :   %x %x \n",*esp,esp);
+  //printf("%s\n", esp);
+  
+  char *token;
+  int length_token = 0;
+  //char **address = malloc(2*sizeof(char *));
+  int arg_count = 0;
+  //int address_size = 2;
+  char *start = NULL;
+  char *sp = *esp;
+  char *actual_arg = NULL;
+  start = *esp;
+  for(token = (char *) file_name; token != NULL; token = strtok_r(NULL, " ", save_ptr)){
+    //printf("\n%s\n", token);
+        //*esp -= strlen(token);
+        //*esp = token;
+        //printf ("\n setup_stack :   %x %x \n",*esp,esp);
+  arg_count++;
+  length_token = strlen(token) + 1;
+        *esp -= length_token;
+        memcpy(*esp, token, length_token);
+        //printf ("\n%x : %s %x\n",esp, *esp, *esp); 
+        //printf ("\n setup_stack :   %x %x\n",*esp,esp);
+        //printf ("\n %x : %c %d \n",esp, *esp, *esp);
+  }
+  //*start = *esp + length_token;
+  //char *aesp = *esp;
+  actual_arg = *esp;
+
+   //printf("\n actual arg: %x, %x and start: %x, %x \n", actual_arg, *actual_arg, start, *start);
+
+  //hex_dump(*esp, *esp, PHYS_BASE - *esp, true); 
+ 
+  int *align = (int *)0;
+
+  //printf("\n printing esp:");
+  int word_align = (size_t)*esp % 4;
+  //printf("\n word_align %d\n", word_align);
+  if(word_align > 0) {
+    *esp -= word_align;
+    memcpy(*esp, &align, word_align); 
+        //printf("\nword align\n");
+        //printf ("\n%x : %c %x\n",esp, *esp, *esp);
+        
+  }
+
+  //printf("\n after word align: %x %x\n", *esp, esp);
+   
+  //NULL characater
+  *esp -= sizeof(char *);
+   memcpy(*esp, &align, sizeof(char *));
+  //printf("\n after null: %x %x\n", *esp, esp);
+
+   //printf("\n actual arg: %x, %x and start: %x, %x \n", actual_arg, *actual_arg, start, *start);
+  //actual_arg += (sizeof(char *) + word_align);
+  //*esp -= sizeof(char *);
+  //memcpy(*esp, &actual_arg, sizeof(char *));
+ 
+  //printf("\n after first_push: %x %x\n", *esp, esp);
+
+  //printf ("\n%x : %s %x\n",esp, *esp, *esp); 
+  while(actual_arg != start){
+    //printf("\n actual_arg: %x %c, start: %x %c\n", actual_arg, *actual_arg, start, *start);
+        if(*(actual_arg - 1)== NULL && actual_arg + 1 != start){
+
+    ///printf("\n actual_arg storing: %x %c\n", actual_arg, *actual_arg);
+    *esp -= sizeof(char *);
+    memcpy(*esp, &actual_arg, sizeof(char *));
+  }
+        actual_arg +=1;
+  }
+
+
+  //printf ("\n%x : %s %x\n",esp, *esp, *esp); 
+
+  char *arg_address = NULL;
+  arg_address = *esp;
+  *esp -= sizeof(char **);
+  memcpy(*esp, &arg_address, sizeof(char **));
+ 
+  //printf ("\n%x : %s %x\n",esp, *esp, *esp); 
+
+  *esp -= sizeof(int);
+  memcpy(*esp, &arg_count, sizeof(int));   
+
+  //printf ("\n%x : %s %x\n",esp, *esp, *esp); 
+  *esp -= sizeof(void *);
+  memcpy(*esp, &align, sizeof(void *));
+
+  
+  return success;
+}
+
+
 
 /* Adds a mapping from user virtual address UPAGE to kernel
    virtual address KPAGE to the page table.
