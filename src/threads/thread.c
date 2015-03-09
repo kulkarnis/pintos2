@@ -569,7 +569,7 @@ init_thread (struct thread *t, const char *name, int priority)
   cond_init (&t->child_condition);
   lock_init (&t->child_cond_lock);
   list_init (&t->files_owned_list);
-  t->file_desc = 2;
+  t->file_desc = 2; //0-STDIN, 1-STDOUT
 
 
   old_level = intr_disable ();

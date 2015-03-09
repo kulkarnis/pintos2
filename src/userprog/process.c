@@ -251,6 +251,23 @@ lock_acquire (chp->wait_lock);
 
 cond_signal (chp->condition, chp->wait_lock);
 */
+//removes child processes
+
+   struct list_elem *e = list_begin (&thread_current()->child_list);
+   struct list_elem *next;
+   while (e != list_end (&thread_current()->child_list))
+   {
+     struct child_process *chp = list_entry (e, struct child_process,
+                                          elem);
+     next = list_next(e);
+     list_remove (&chp->elem);
+     free (chp);
+     e = next;
+   }
+
+//Close files owned
+   close_all_files();
+   
 
   struct thread *cur = thread_current ();
   uint32_t *pd;
